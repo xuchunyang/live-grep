@@ -1,25 +1,30 @@
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 
+#define MYLIMIT 16384
+
 void
-grep (char* pattern, FILE* instream)
+grep (char* pattern, FILE* stream)
 {
-  /* XXX: Very long line will fail? */
-  char* buffer = 0;
-  size_t n = 0;
-  while (getline (&buffer, &n, instream) != -1)
+  char* line = malloc (MYLIMIT + 1);
+  if (line == NULL)
+    {
+      perror ("malloc");
+      exit (EXIT_FAILURE);
+    }
+
+  /* XXX: Line longer than MYLIMIT will split */
+  while (fgets (line, MYLIMIT + 1, stream) != NULL)
     {
       /* XXX: Use regular expression */
       /* XXX: Find all matches not just the first one */
       /* XXX: Colorized the matching part */
-      if (strstr (buffer, pattern))
-        fputs (buffer, stdout);
+      if (strstr (line, pattern))
+        fputs (line, stdout);
     }
-  free (buffer);
+  free (line);
 }
 
 int
