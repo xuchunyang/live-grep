@@ -44,17 +44,22 @@ main (int argc, char* argv[argc+1])
 
   for (int i = 2; i < argc; i++) /* two or more arguments */
     {
-      /* XXX: Handle '-' as stdin */
-      FILE* instream = fopen (argv[i], "r");
-      if (instream)
-        {
-          grep (argv[1], instream);
-          fclose (instream);
-        }
+      /* '-' stands for stdin */
+      if (strcmp (argv[i], "-") == 0)
+          grep (argv[1], stdin);
       else
         {
-          perror ("fopen");
-          errno = 0;            /* reset error code */
+          FILE* instream = fopen (argv[i], "r");
+          if (instream)
+            {
+              grep (argv[1], instream);
+              fclose (instream);
+            }
+          else
+            {
+              perror ("fopen");
+              errno = 0;            /* reset error code */
+            }
         }
     }
 
